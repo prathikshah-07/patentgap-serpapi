@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PatentGap — Find the gaps nobody is filling</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="logo">PATENTGAP</a>
+      <div class="header-right">
+        <span class="mono muted">v1.0</span>
+        <a href="/docs" class="btn btn-secondary btn-sm">Docs</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container hero">
+    <div class="hero-grid" aria-hidden="true"></div>
+
+    <p class="label hero-eyebrow">
+      PATENT INTELLIGENCE · 4 SOURCES · LIVE
+    </p>
+
+    <h1 class="hero-headline">
+      <span class="line-1">Find the gaps</span>
+      <span class="line-2">nobody is filling.</span>
+    </h1>
+
+    <p class="hero-sub">
+      Enter a technology idea. We map the existing patent and research
+      landscape, then surface the white space worth building in.
+    </p>
+
+    <form method="POST" action="/analyze" class="query-form" id="query-form">
+      <textarea
+        name="query"
+        id="query-input"
+        class="query-input"
+        rows="4"
+        placeholder="Describe your technology idea, e.g. 'Smart irrigation using soil sensors and satellite data for small farms'"
+        required
+      ></textarea>
+
+      {% if error %}
+      <div class="form-error">{{ error }}</div>
+      {% endif %}
+
+      <div class="example-chips">
+        {% for ex in examples %}
+        <button type="button" class="chip" data-fill="{{ ex }}">{{ ex }}</button>
+        {% endfor %}
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" id="clear-btn">Clear</button>
+        <button type="submit" class="btn btn-primary" id="submit-btn">
+          Analyze landscape
+        </button>
+      </div>
+    </form>
+
+    <section class="signal-cards">
+      <div class="signal-card">
+        <div class="signal-icon">◈</div>
+        <p class="label">SIGNAL 01</p>
+        <h3>Intersection scarcity</h3>
+        <p>Two active pillars with almost no work combining them. The strongest gap.</p>
+        <p class="mono muted signal-stat">weight 0.50</p>
+      </div>
+      <div class="signal-card">
+        <div class="signal-icon">◇</div>
+        <p class="label">SIGNAL 02</p>
+        <h3>Missing context</h3>
+        <p>Technology exists, but nobody applies it to low-cost, rural, or off-grid constraints.</p>
+        <p class="mono muted signal-stat">weight 0.35</p>
+      </div>
+      <div class="signal-card">
+        <div class="signal-icon">◉</div>
+        <p class="label">SIGNAL 03</p>
+        <h3>Recency imbalance</h3>
+        <p>Old results, thin recent activity. Weaker on novelty, strong on opportunity.</p>
+        <p class="mono muted signal-stat">weight 0.15</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <span class="mono muted">Sources: Google Patents · Scholar · Search · News · via SerpApi</span>
+      <span class="mono muted">v1.0</span>
+    </div>
+  </footer>
+
+  <script>
+    document.querySelectorAll('.chip').forEach(function (chip) {
+      chip.addEventListener('click', function () {
+        var input = document.getElementById('query-input');
+        input.value = chip.getAttribute('data-fill');
+        input.focus();
+      });
+    });
+
+    document.getElementById('clear-btn').addEventListener('click', function () {
+      var input = document.getElementById('query-input');
+      input.value = '';
+      input.focus();
+    });
+
+    document.getElementById('query-form').addEventListener('submit', function () {
+      var btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.textContent = 'Analyzing…';
+    });
+  </script>
+
+</body>
+</html>

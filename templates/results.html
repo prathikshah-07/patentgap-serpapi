@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PatentGap — {{ analysis.query }}</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="logo">PATENTGAP</a>
+      <div class="header-right">
+        <span class="mono muted">
+          {% if analysis.meta.cached %}CACHED{% else %}FRESH{% endif %}
+        </span>
+        <a href="/" class="btn btn-secondary btn-sm">New analysis</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container results">
+
+    <!-- Toolbar -->
+    <div class="results-toolbar">
+      <div class="toolbar-query">
+        <p class="label">QUERY</p>
+        <p class="mono">{{ analysis.query }}</p>
+      </div>
+      <div class="toolbar-stats">
+        <div class="stat">
+          <p class="label">CALLS</p>
+          <p class="mono">{{ analysis.meta.serpapi_calls }}</p>
+        </div>
+        <div class="stat">
+          <p class="label">ELAPSED</p>
+          <p class="mono">
+            {% if analysis.meta.cached %}cached{% else %}{{ (analysis.meta.elapsed_ms / 1000) | round(1) }}s{% endif %}
+          </p>
+        </div>
+        <div class="stat">
+          <p class="label">GAPS</p>
+          <p class="mono">{{ analysis.gaps | length }}</p>
+        </div>
+        <div class="stat">
+          <p class="label">GENERATED</p>
+          <p class="mono">{{ generated_at }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Headline finding -->
+    {% if analysis.gaps %}
+    <section class="headline-finding">
+      <p class="label">HEADLINE FINDING</p>
+      <p class="headline-statement">{{ analysis.gaps[0].statement }}</p>
+      <p class="headline-meta mono muted">
+        Gap score {{ analysis.gaps[0].gap_score | round(0) | int }} ·
+        {{ analysis.gaps[0].pillar_a }} × {{ analysis.gaps[0].pillar_b }}
+      </p>
+    </section>
+    {% endif %}
+
+    <div class="results-grid">
+
+      <!-- LEFT COLUMN — landscape -->
+      <section class="landscape">
+        <p class="label section-label">01 · LANDSCAPE</p>
+
+        {% if analysis.pillars %}
+        <div class="pillar-list">
+          {% for p in analysis.pillars %}
+          <div class="pillar-row">
+            <div class="pillar-name">{{ p.name }}</div>
+            <div class="pillar-counts">
+              <span class="mono muted">{{ p.counts.patents }} patents</span>
+              <span class="mono muted">{{ p.counts.scholar }} papers</span>
+              <span class="mono muted">{{ p.counts.search }} products</span>
+              <span class="mono muted">{{ p.counts.news }} news</span>
+            </div>
+            <div class="pillar-bar">
+              {% set total = p.counts.patents + p.counts.scholar + p.counts.search + p.counts.news %}
+              {% set pct = (total / 40) * 100 %}
+              <div class="pillar-bar-fill" style="width: {{ pct if pct < 100 else 100 }}%"></div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+          <p class="mono muted">No pillars extracted. Try a more specific technology description.</p>
+        </div>
+        {% endif %}
+      </section>
+
+      <!-- RIGHT COLUMN — gaps -->
+      <section class="gaps">
+        <p class="label section-label">02 · WHITE SPACE</p>
+
+        {% if analysis.gaps %}
+        <div class="gap-list">
+          {% for g in analysis.gaps %}
+            {% include "partials/gap-card.html" %}
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+          <p class="mono muted">No gaps detected. Try a query with at least two distinct technology pillars.</p>
+        </div>
+        {% endif %}
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <span class="mono muted">Sources: Google Patents · Scholar · Search · News · via SerpApi</span>
+      <span class="mono muted">
+        {% if analysis.meta.cached %}served from cache{% else %}fresh{% endif %}
+      </span>
+    </div>
+  </footer>
+
+</body>
+</html>

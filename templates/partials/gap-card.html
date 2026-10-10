@@ -1,0 +1,64 @@
+<article class="gap-card">
+  <header class="gap-header">
+    <div class="gap-score">
+      <span class="score-number">{{ g.gap_score | round(0) | int }}</span>
+      <span class="score-label label">GAP</span>
+    </div>
+    <div class="gap-pillars">
+      <span class="mono">{{ g.pillar_a }}</span>
+      <span class="mono muted"> × </span>
+      <span class="mono">{{ g.pillar_b }}</span>
+    </div>
+  </header>
+
+  <p class="gap-statement">{{ g.statement }}</p>
+
+  <div class="gap-signals">
+    <div class="signal-row">
+      <span class="label">SCARCITY</span>
+      <div class="signal-track">
+        <div class="signal-fill signal-violet" style="width: {{ (g.scarcity_score * 100) | round(0) }}%"></div>
+      </div>
+      <span class="mono muted">{{ (g.scarcity_score * 100) | round(0) | int }}%</span>
+    </div>
+    <div class="signal-row">
+      <span class="label">CONTEXT</span>
+      <div class="signal-track">
+        <div class="signal-fill signal-cyan" style="width: {{ (g.context_score * 100) | round(0) }}%"></div>
+      </div>
+      <span class="mono muted">{{ (g.context_score * 100) | round(0) | int }}%</span>
+    </div>
+    <div class="signal-row">
+      <span class="label">RECENCY</span>
+      <div class="signal-track">
+        <div class="signal-fill signal-warning" style="width: {{ (g.recency_score * 100) | round(0) }}%"></div>
+      </div>
+      <span class="mono muted">{{ (g.recency_score * 100) | round(0) | int }}%</span>
+    </div>
+  </div>
+
+  {% if g.closest_prior_art %}
+  <div class="gap-prior-art">
+    <p class="label">CLOSEST PRIOR ART</p>
+    <ul class="prior-art-list">
+      {% for r in g.closest_prior_art[:5] %}
+      <li class="prior-art-item">
+        <div class="prior-art-title">
+          {% if r.url %}
+          <a href="{{ r.url }}" target="_blank" rel="noopener">{{ r.title }}</a>
+          {% else %}
+          {{ r.title }}
+          {% endif %}
+        </div>
+        <div class="prior-art-meta mono muted">
+          {% if r.engine %}<span class="engine-tag engine-{{ r.engine }}">{{ r.engine }}</span>{% endif %}
+          {% if r.year %}· {{ r.year }}{% endif %}
+          {% if r.assignee %}· {{ r.assignee }}{% endif %}
+          {% if r.citations is not none %}· {{ r.citations }} cites{% endif %}
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+</article>
